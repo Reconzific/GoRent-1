@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GoRent - Register & Login</title>
+<link rel="stylesheet" href="style.css" />
+<style>
+  body {
+    background: #f6f7fb;
+    font-family: 'Inter', Arial, sans-serif;
+    margin: 0;
+  }
+  .container {
+    max-width: 350px;
+    margin: 48px auto 0 auto;
+    background: #fff;
+    padding: 38px 28px 32px 28px;
+    border-radius: 22px;
+    box-shadow: 0 8px 32px rgba(60,60,100,0.12);
+  }
+  .logo-image {
+    width: 48px;
+    vertical-align: middle;
+    margin-right: 13px;
+  }
+  .logo {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #1661ee;
+    vertical-align: middle;
+  }
+  .register-heading {
+    color: #222;
+    font-size: 2rem;
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 30px;
+    margin-top: 12px;
+  }
+  .form-card label {
+    display: block;
+    margin-bottom: 8px;
+    margin-top: 12px;
+    color: #333;
+    font-weight: 500;
+    font-size: 1.07rem;
+  }
+  .form-card input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #e1e5ee;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1.02rem;
+    margin-bottom: 6px;
+    margin-top: 2px;
+    background: #f8fafd;
+  }
+  .btn {
+    display: block;
+    background: #1661ee;
+    color: white;
+    border: none;
+    font-size: 1.15rem;
+    font-weight: 700;
+    border-radius: 30px;
+    padding: 15px 0;
+    width: 100%;
+    margin: 24px 0 0 0;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(16,83,211,0.07);
+    transition: background 0.15s;
+  }
+  .btn:hover {
+    background: #1651bf;
+  }
+  .error {
+    color: #e03c3c;
+    font-size: 1rem;
+    text-align: center;
+    margin-top: 14px;
+    min-height: 18px;
+  }
+  .switch-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 1.03rem;
+  }
+  .switch-link a {
+    color: #1661ee;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  footer {
+    text-align: center;
+    margin-top: 40px;
+    color: #aaa;
+    font-size: 1rem;
+    background: none;
+    border: none;
+  }
+  @media (max-width: 480px) {
+    .container {
+      max-width: 98vw;
+      margin-top: 22px;
+      padding: 18px 6vw 22px 6vw;
+    }
+  }
+  .hidden { display: none !important; }
+  .fade-in {
+    animation: fadeInAnim 0.6s ease forwards;
+  }
+  .fade-out {
+    animation: fadeOutAnim 0.5s ease forwards;
+  }
+  @keyframes fadeInAnim {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fadeOutAnim {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container fade-in">
+  <header>
+    <img src="logo.jpg" alt="GoRent Logo" class="logo-image" />
+    <span class="logo">GoRent</span>
+  </header>
+  <!-- Registration Section -->
+  <section id="register-section" class="form-card fade-in">
+    <div class="register-heading">Register</div>
+    <label for="reg-username">Username</label>
+    <input id="reg-username" type="text" placeholder="Username" autocomplete="username" />
+    <label for="reg-password">Password</label>
+    <input id="reg-password" type="password" placeholder="Password" autocomplete="new-password" />
+    <label for="reg-name">Full Name</label>
+    <input id="reg-name" type="text" placeholder="Full Name" autocomplete="name" />
+    <label for="reg-email">Email</label>
+    <input id="reg-email" type="email" placeholder="Email" autocomplete="email" />
+    <label for="reg-phone">Phone Number</label>
+    <input id="reg-phone" type="tel" placeholder="Phone Number" autocomplete="tel" />
+    <button class="btn" onclick="registerUser()">Register</button>
+    <div class="switch-link">
+      Already have an account? <a onclick="showLoginPage(); return false;">Login here</a>
+    </div>
+    <p id="reg-error" class="error"></p>
+  </section>
+  <!-- Login Section -->
+  <section id="login-section" class="form-card hidden">
+    <div class="register-heading">Login</div>
+    <label for="login-username">Username</label>
+    <input id="login-username" type="text" placeholder="Username" autocomplete="username" />
+    <label for="login-password">Password</label>
+    <input id="login-password" type="password" placeholder="Password" autocomplete="current-password" />
+    <button class="btn" onclick="loginUser()">Login</button>
+    <div class="switch-link">
+      New to GoRent? <a onclick="showRegisterPage(); return false;">Register here</a>
+    </div>
+    <p id="login-error" class="error"></p>
+  </section>
+  <footer>© 2025 GoRent. All rights reserved.</footer>
+</div>
+
+<script>
+function fadeOut(element) {
+  element.classList.add('fade-out');
+  setTimeout(() => element.classList.add('hidden'), 500);
+}
+function fadeIn(element) {
+  element.classList.remove('hidden');
+  element.classList.remove('fade-out');
+  element.classList.add('fade-in');
+}
+function showLoginPage() {
+  fadeOut(document.getElementById('register-section'));
+  setTimeout(() => fadeIn(document.getElementById('login-section')), 500);
+}
+function showRegisterPage() {
+  fadeOut(document.getElementById('login-section'));
+  setTimeout(() => fadeIn(document.getElementById('register-section')), 500);
+}
+
+function registerUser() {
+  const username = document.getElementById('reg-username').value.trim();
+  const password = document.getElementById('reg-password').value.trim();
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+
+  document.getElementById('reg-error').textContent = '';
+  if (!username || !password || !name || !email || !phone) {
+    document.getElementById('reg-error').textContent = 'Please fill out all fields.';
+    return;
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  if (!emailRegex.test(email)) {
+    document.getElementById('reg-error').textContent = 'Please enter a valid email.';
+    return;
+  }
+  const phoneRegex = /^[6-9][0-9]{9}$/;
+  if (!phoneRegex.test(phone)) {
+    document.getElementById('reg-error').textContent = 'Enter a valid 10-digit mobile number.';
+    return;
+  }
+
+  fetch('http://localhost:5000/api/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password, name, email, phone })
+  })
+  .then(res => res.json())
+  .then(result => {
+    if (result.success) {
+      fadeOut(document.getElementById('register-section'));
+      setTimeout(() => fadeIn(document.getElementById('login-section')), 500);
+    } else {
+      document.getElementById('reg-error').textContent = result.error || 'Registration failed.';
+    }
+  })
+  .catch(() => {
+    document.getElementById('reg-error').textContent = 'Network error during registration.';
+  });
+}
+
+function loginUser() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+
+  document.getElementById('login-error').textContent = '';
+  if (!username || !password) {
+    document.getElementById('login-error').textContent = 'Please enter username and password.';
+    return;
+  }
+
+  fetch('http://localhost:5000/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password })
+  })
+  .then(res => res.json())
+  .then(result => {
+    if (result.success) {
+      window.location.href = 'car-listings.html';
+    } else {
+      document.getElementById('login-error').textContent = result.error || 'Login failed.';
+    }
+  })
+  .catch(() => {
+    document.getElementById('login-error').textContent = 'Network error during login.';
+  });
+}
+</script>
+</body>
+</html>

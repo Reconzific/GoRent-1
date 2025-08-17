@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GoRent - Cars</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Chatbox specific styles */
+    #ai-chat-container {
+      margin-top: 32px;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #ai-chat {
+      max-height: 250px;
+      overflow-y: auto;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 8px;
+      font-family: Arial, sans-serif;
+    }
+    #ai-chat .msg {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+    #ai-chat .user {
+      background-color: #d1f7d1;
+      text-align: right;
+      margin-left: auto;
+    }
+    #ai-chat .ai {
+      background-color: #d1e7ff;
+      text-align: left;
+      margin-right: auto;
+    }
+    #ai-chat-buttons {
+      text-align: center;
+    }
+    #ai-chat-buttons button {
+      margin: 10px 8px 0 0;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      color: white;
+    }
+    #start-btn {
+      background: #007bff;
+    }
+    #start-btn:hover {
+      background: #0056b3;
+    }
+    #pause-btn {
+      background: #ff9800;
+    }
+    #pause-btn:hover {
+      background: #e68900;
+    }
+  </style>
+</head>
+<body>
+  <div class="container fade-in">
+    <header>
+      <span class="logo" style="color: #0056d6; font-weight:700;">GoRent</span>
+      <nav>
+        <a href="juh.html">Home</a>
+        <a href="car-listings.html" class="active">Cars</a>
+        <a href="booking.html">Book</a>
+        <a href="#">Contact</a>
+      </nav>
+    </header>
+    <main>
+      <h1>Available Cars</h1>
+      <div id="car-listings" class="car-listings"></div>
+      <div id="loading" class="loading-message">Loading cars...</div>
+      <div id="empty" class="empty-message hidden">No cars available at the moment.</div>
+    </main>
+
+    <!-- AI Voice Chatbox Section -->
+    <section id="ai-chat-container" aria-label="AI Voice Chat">
+      <h2>🎤 AI Voice Chat</h2>
+      <div id="ai-chat" role="log" aria-live="polite"></div>
+      <div id="ai-chat-buttons">
+        <button id="start-btn" onclick="startAiListening()">🎙️ Speak</button>
+        <button id="pause-btn" onclick="toggleAiPause()">⏸️ Pause</button>
+      </div>
+    </section>
+  </div>
+  <script>
+    // Car listings fetch and render
+    const loadingElem = document.getElementById('loading');
+    const emptyElem = document.getElementById('empty');
+    const carContainer = document.getElementById('car-listings');
+
+    fetch('http://localhost:5000/api/cars')
+      .then(res => res.json())
+      .then(cars => {
+        loadingElem.classList.add('hidden');
+        if (!cars.length) {
+          emptyElem.classList.remove('hidden');
+          return;
+        }
+        cars.forEach(car => {
+          const card = document.createElement('div');
+          card.className = 'car-card fade-in';
+          card.innerHTML = `
+            <img src="${car.image_url || 'https://via.placeholder.com/150?text=' + encodeURIComponent(car.name)}" alt="${car.name}" class="car-image" />
+            <h3>${car.name}</h3>
+            <p>Type: ${car.type}</p>
+            <p>Price: ₹${car.price} / day</p>
+            <button class="book-btn"
+              onclick="location.href='booking.html?vehicle=${encodeURIComponent(car.name)}&rate=${car.price}&type=car'">
+              Book Now
+            </button>
+          `;
+          carContainer.appendChild(card);
+        });
+      })
+      .catch(err => {
+        console.error('Error loading cars:', err);
+        loadingElem.textContent = 'Failed to load cars. Please try again later.';
+      });
+
+    // AI Voice Chatbox JS with unique function and variable names
+    const API_KEY = "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";
+    const chatBox = document.getElementById("ai-chat");
+    let isPaused = false;
+
+    function addAiMessage(text, sender) {
+      const div = document.createElement("div");
+      div.className = "msg " + sender;
+      div.textContent = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function startAiListening() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("Speech Recognition API not supported in this browser");
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.start();
+      recognition.onresult = async (event) => {
+        const transcript = event.results[0].transcript;
+        addAiMessage(transcript, "user");
+        getAiResponse(transcript);
+      };
+    }
+
+    async function getAiResponse(userText) {
+      addAiMessage("Thinking...", "ai");
+      try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "user", content: userText }]
+          })
+        });
+        const data = await res.json();
+        if (!data.choices || !data.choices.length) {
+          console.error("OpenAI API error response:", data);
+          addAiMessage("Sorry, I couldn't get a response.", "ai");
+          return;
+        }
+        const aiText = data.choices[0].message.content;
+        const messages = chatBox.getElementsByClassName("ai");
+        if (messages.length) messages[messages.length - 1].textContent = aiText;
+        speakAi(aiText);
+      } catch (error) {
+        console.error("OpenAI API error:", error);
+        addAiMessage("Sorry, I couldn't get a response.", "ai");
+      }
+    }
+
+    function speakAi(text) {
+      const speech = new SpeechSynthesisUtterance(text);
+      speech.lang = "en-US";
+      speech.rate = 1;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(speech);
+    }
+
+    function toggleAiPause() {
+      if (!isPaused) {
+        window.speechSynthesis.pause();
+        document.getElementById("pause-btn").textContent = "▶️ Resume";
+        isPaused = true;
+      } else {
+        window.speechSynthesis.resume();
+        document.getElementById("pause-btn").textContent = "⏸️ Pause";
+        isPaused = false;
+      }
+    }
+  </script>
+</body>
+</html>

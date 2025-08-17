@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GoRent - Book Your Car</title>
+<link rel="stylesheet" href="style.css" />
+<style>
+  .form-card {
+    max-width: 430px;
+    margin: 50px auto;
+    padding: 36px 28px 28px 28px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  }
+  .form-card label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #333;
+    font-size: 1.08rem;
+  }
+  .form-card input {
+    width: 100%;
+    padding: 16px 16px;
+    font-size: 1.12rem;
+    border: 1.5px solid #ccc;
+    border-radius: 10px;
+    margin-bottom: 22px;
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: #f9fafc;
+    box-sizing: border-box;
+  }
+  .form-card input:focus {
+    border-color: #0056d6;
+    box-shadow: 0 0 8px rgba(0,86,214,0.16);
+    background-color: #fff;
+  }
+  .form-card .btn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 15px 0;
+    font-size: 1.18rem;
+    border-radius: 100px;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+  <div class="container fade-in">
+    <header>
+      <span class="logo">GoRent</span>
+    </header>
+    <main>
+      <h1 style="text-align:center; margin: 38px 0 12px; color:#222;">Car Booking</h1>
+      <form id="bookingForm" class="form-card">
+        <label>Pickup Location:
+          <input type="text" id="pickup" required />
+        </label>
+        <label>Dropoff Location:
+          <input type="text" id="dropoff" required />
+        </label>
+        <label>From:
+          <input type="datetime-local" id="from" required />
+        </label>
+        <label>To:
+          <input type="datetime-local" id="to" required />
+        </label>
+        <button type="submit" class="btn">Confirm Booking</button>
+      </form>
+    </main>
+  </div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const car = urlParams.get("car");
+const rate = urlParams.get("rate");
+
+document.getElementById("bookingForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const pickup = document.getElementById("pickup").value;
+  const dropoff = document.getElementById("dropoff").value;
+  const from = document.getElementById("from").value;
+  const to = document.getElementById("to").value;
+
+  if (new Date(to) <= new Date(from)) {
+    alert("Dropoff date must be after the pickup date.");
+    return;
+  }
+
+  const confirmationUrl = `confirmation.html?car=${encodeURIComponent(car)}&rate=${rate}&pickup=${encodeURIComponent(pickup)}&dropoff=${encodeURIComponent(dropoff)}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
+  window.location.href = confirmationUrl;
+});
+</script>
+</body>
+</html>

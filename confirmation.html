@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Booking Confirmed - GoRent</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container confirmation-card fade-in">
+    <div class="checkmark">✔</div>
+    <h2>Booking Confirmed!</h2>
+    <p><b>Car:</b> <span id="car"></span></p>
+    <p><b>Pickup:</b> <span id="pickup"></span></p>
+    <p><b>Dropoff:</b> <span id="dropoff"></span></p>
+    <p><b>From:</b> <span id="from"></span></p>
+    <p><b>To:</b> <span id="to"></span></p>
+    <p><b>Total Amount:</b> <span id="total"></span></p>
+    <a href="car-listings.html" class="btn">Back to Car Listings</a>
+  </div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const car = urlParams.get("car");
+const rateStr = urlParams.get("rate");
+const pickup = urlParams.get("pickup");
+const dropoff = urlParams.get("dropoff");
+const fromStr = urlParams.get("from");
+const toStr = urlParams.get("to");
+
+const from = new Date(fromStr);
+const to = new Date(toStr);
+const rate = parseFloat(rateStr);
+
+const days = Math.ceil((to - from) / (1000 * 60 * 60 * 24));
+const totalAmount = rate * (days > 0 ? days : 1);
+
+document.getElementById("car").textContent = car || "Unknown";
+document.getElementById("pickup").textContent = pickup || "...";
+document.getElementById("dropoff").textContent = dropoff || "...";
+document.getElementById("from").textContent = from.toLocaleString() || "...";
+document.getElementById("to").textContent = to.toLocaleString() || "...";
+
+if (!isNaN(totalAmount)) {
+  document.getElementById("total").textContent = `₹${totalAmount.toFixed(2)}`;
+} else {
+  document.getElementById("total").textContent = "Calculation Error";
+}
+</script>
+</body>
+</html>
